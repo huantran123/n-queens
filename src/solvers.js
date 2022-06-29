@@ -21,6 +21,32 @@ var makeEmptyMatrix = function(n) {
 };
 
 
+var findNRooksSolutionSet = function(n) {
+  var solutions = [];
+  var matrix = makeEmptyMatrix(n);
+  var board = new Board(matrix);
+  var firstRowIndex = 0;
+  var findNRooksSolutions = function(rowIndex) {
+    if (rowIndex === n) {
+      var rows = JSON.parse(JSON.stringify(board.rows()));
+      solutions.push(rows);
+      return;
+    }
+    for (var colIndex = 0; colIndex < n; colIndex++ ) {
+      board.togglePiece(rowIndex, colIndex);
+      if (!board.hasAnyRooksConflicts()) {
+        findNRooksSolutions(rowIndex + 1);
+        board.togglePiece(rowIndex, colIndex);
+      } else {
+        board.togglePiece(rowIndex, colIndex);
+      }
+    }
+  };
+  findNRooksSolutions(firstRowIndex);
+  return solutions;
+};
+
+
 
 window.findNRooksSolution = function(n) {
   var solution = makeEmptyMatrix(n);
@@ -28,21 +54,28 @@ window.findNRooksSolution = function(n) {
     solution[i][i] = 1;
   }
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = function (n) {
-    if (n === 1) {
-      return n;
-    }
-    return n * solutionCount(n - 1);
-  }; //fixme
+  // var solutionCount = function (n) {
+  //   if (n === 1) {
+  //     return n;
+  //   }
+  //   return n * solutionCount(n - 1);
+  // }; //fixme
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount(n);
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  // return solutionCount(n);
+
+
+  return solutionCount = findNRooksSolutionSet(n).length;
+
+
+
+
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
@@ -59,7 +92,7 @@ var findNQueensSolutionSet = function(n) {
     }
     for (var colIndex = 0; colIndex < n; colIndex++ ) {
       board.togglePiece(rowIndex, colIndex);
-      if (!board.hasColConflictAt(colIndex) && !board.hasRowConflictAt(rowIndex) && !board.hasAnyMinorDiagonalConflicts() && !board.hasAnyMajorDiagonalConflicts()) {
+      if (!board.hasAnyQueenConflictsOn(rowIndex, colIndex)) {
         findNQueensSolutions(rowIndex + 1);
         board.togglePiece(rowIndex, colIndex);
       } else {
@@ -85,7 +118,7 @@ window.findNQueensSolution = function(n) {
 
 
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
@@ -103,7 +136,7 @@ window.countNQueensSolutions = function(n) {
 
 
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solutionCount));
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solutionCount));
   return solutionCount;
 };
 
